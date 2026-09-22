@@ -1,0 +1,40 @@
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+export type Client = { id:string; full_name:string; phone:string; instagram:string|null; birth_date:string|null; notes:string|null; created_at:string };
+export type Service = { id:string; name:string; description:string|null; duration_minutes:number; price:number; is_active:boolean; created_at:string };
+export type Appointment = { id:string; client_id:string; service_id:string; appointment_date:string; start_time:string; end_time:string; price:number; comment:string|null; status:"scheduled"|"confirmed"|"completed"|"cancelled"; created_at:string };
+
+type CRMContextValue = {
+  clients: Client[]; services: Service[]; appointments: Appointment[]; loading:boolean;
+  refresh:()=>Promise<void>; saveClient:(value:Partial<Client>&{full_name:string;phone:string}, id?:string)=>Promise<boolean>;
+  removeClient:(id:string)=>Promise<boolean>; saveService:(value:Partial<Service>&{name:string;duration_minutes:number;price:number},id?:string)=>Promise<boolean>;
+  removeService:(id:string)=>Promise<boolean>; saveAppointment:(value:Partial<Appointment>&{client_id:string;service_id:string;appointment_date:string;start_time:string;end_time:string;price:number},id?:string)=>Promise<boolean>;
+  removeAppointment:(id:string)=>Promise<boolean>; setStatus:(id:string,status:Appointment["status"])=>Promise<void>;
+};
+const CRMContext=createContext<CRMContextValue|null>(null);
+const defaults=[
+ {name:"Классическое наращивание",description:"Естественный объём и выразительный взгляд",duration_minutes:120,price:2500},
+ {name:"Объём 2D",description:"Мягкий двойной объём",duration_minutes:150,price:3000},
+ {name:"Объём 3D",description:"Пышный тройной объём",duration_minutes:180,price:3500},
+ {name:"Коррекция ресниц",description:"Обновление формы и объёма",duration_minutes:90,price:2000},
+ {name:"Снятие ресниц",description:"Бережное снятие материала",duration_minutes:30,price:700},
+];
+export function CRMProvider({children}:{children:ReactNode}){
+ const [clients,setClients]=useState<Client[]>([]),[services,setServices]=useState<Service[]>([]),[appointments,setAppointments]=useState<Appointment[]>([]),[loading,setLoading]=useState(true);
+ const refresh=async()=>{setLoading(true);const [c,s,a]=await Promise.all([supabase.from("clients").select("*").order("created_at",{ascending:false}),supabase.from("services").select("*").order("created_at"),supabase.from("appointments").select("*").order("appointment_date").order("start_time")]);if(c.error||s.error||a.error)toast.error("Не удалось загрузить данные");setClients((c.data??[]) as Client[]);setServices((s.data??[]) as Service[]);setAppointments((a.data??[]) as Appointment[]);setLoading(false)};
+ useEffect(()=>{void (async()=>{await refresh();const {count}=await supabase.from("services").select("id",{count:"exact",head:true});if(count===0){const {error}=await supabase.from("services").insert(defaults);if(!error)await refresh()}})()},[]);
+ const mutate=async(table:"clients"|"services"|"appointments",value:Record<string,unknown>,id?:string)=>{const result=id?await supabase.from(table).update(value).eq("id",id):await supabase.from(table).insert(value);if(result.error){toast.error("Не удалось сохранить изменения");return false}toast.success(id?"Изменения сохранены":"Запись добавлена");await refresh();return true};
+ const value=useMemo<CRMContextValue>(()=>({clients,services,appointments,loading,refresh,
+  saveClient:(v,id)=>mutate("clients",v,id),removeClient:async id=>{const {error}=await supabase.from("clients").delete().eq("id",id);if(error){toast.error("Не удалось удалить клиента");return false}toast.success("Клиент удалён");await refresh();return true},
+  saveService:(v,id)=>mutate("services",v,id),removeService:async id=>{const {error}=await supabase.from("services").delete().eq("id",id);if(error){toast.error("Нельзя удалить услугу с записями");return false}toast.success("Услуга удалена");await refresh();return true},
+  saveAppointment:(v,id)=>mutate("appointments",v,id),removeAppointment:async id=>{const {error}=await supabase.from("appointments").delete().eq("id",id);if(error){toast.error("Не удалось удалить запись");return false}toast.success("Запись удалена");await refresh();return true},
+  setStatus:async(id,status)=>{await mutate("appointments",{status},id)}
+ }),[clients,services,appointments,loading]);
+ return <CRMContext.Provider value={value}>{children}</CRMContext.Provider>
+}
+export function useCRM(){const value=useContext(CRMContext);if(!value)throw new Error("Данные CRM недоступны");return value}
+export const statusLabels={scheduled:"Запланировано",confirmed:"Подтверждено",completed:"Выполнено",cancelled:"Отменено"} as const;
+export const money=(v:number)=>new Intl.NumberFormat("ru-RU",{style:"currency",currency:"RUB",maximumFractionDigits:0}).format(v);
+export const shortDate=(v:string)=>new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short"}).format(new Date(`${v}T12:00:00`));
