@@ -14,7 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          appointment_date: string
+          client_id: string
+          comment: string | null
+          created_at: string
+          end_time: string
+          id: string
+          owner_id: string
+          price: number
+          service_id: string
+          start_time: string
+          status: string
+        }
+        Insert: {
+          appointment_date: string
+          client_id: string
+          comment?: string | null
+          created_at?: string
+          end_time: string
+          id?: string
+          owner_id?: string
+          price: number
+          service_id: string
+          start_time: string
+          status?: string
+        }
+        Update: {
+          appointment_date?: string
+          client_id?: string
+          comment?: string | null
+          created_at?: string
+          end_time?: string
+          id?: string
+          owner_id?: string
+          price?: number
+          service_id?: string
+          start_time?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          birth_date: string | null
+          created_at: string
+          full_name: string
+          id: string
+          instagram: string | null
+          notes: string | null
+          owner_id: string
+          phone: string
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          instagram?: string | null
+          notes?: string | null
+          owner_id?: string
+          phone: string
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          instagram?: string | null
+          notes?: string | null
+          owner_id?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          owner_id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          name: string
+          owner_id: string
+          price: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes: number
+          id?: string
+          is_active?: boolean
+          name: string
+          owner_id?: string
+          price: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          owner_id?: string
+          price?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
