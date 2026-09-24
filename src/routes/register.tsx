@@ -47,7 +47,18 @@ function Register() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message.includes("registered") ? "Этот адрес уже зарегистрирован" : "Не удалось зарегистрироваться. Попробуйте ещё раз");
+      const m = error.message.toLowerCase();
+      setError(
+        m.includes("registered")
+          ? "Этот адрес уже зарегистрирован"
+          : m.includes("weak") || m.includes("guess") || m.includes("pwned")
+            ? "Этот пароль слишком простой или встречался в утечках данных. Придумайте более надёжный: 10+ символов, заглавные и строчные буквы, цифры и символ (например, !)"
+            : m.includes("rate") || m.includes("security purposes")
+              ? "Слишком много попыток. Подождите минуту и попробуйте снова"
+              : m.includes("password")
+                ? "Пароль не подходит по требованиям безопасности. Выберите более сложный пароль"
+                : "Не удалось зарегистрироваться. Попробуйте ещё раз",
+      );
       return;
     }
     if (data.session) {
