@@ -166,7 +166,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_owner: { Args: { _full_name: string }; Returns: boolean }
+      owner_exists: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

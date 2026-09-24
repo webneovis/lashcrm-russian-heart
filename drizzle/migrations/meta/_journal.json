@@ -8,6 +8,13 @@
       "when": 1790101804265,
       "tag": "0000_create_lash_crm_core",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790238661445,
+      "tag": "0001_single_salon_owner",
+      "breakpoints": true
     }
   ]
 }
