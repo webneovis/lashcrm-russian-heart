@@ -128,8 +128,30 @@ export type Database = {
         }
         Relationships: []
       }
+      service_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
+          category_id: string | null
           created_at: string
           description: string | null
           duration_minutes: number
@@ -140,6 +162,7 @@ export type Database = {
           price: number
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           description?: string | null
           duration_minutes: number
@@ -150,6 +173,7 @@ export type Database = {
           price: number
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
@@ -159,7 +183,15 @@ export type Database = {
           owner_id?: string
           price?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

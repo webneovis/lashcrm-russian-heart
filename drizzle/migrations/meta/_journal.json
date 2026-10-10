@@ -15,6 +15,13 @@
       "when": 1790238661445,
       "tag": "0001_single_salon_owner",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791659316027,
+      "tag": "0002_service_categories",
+      "breakpoints": true
     }
   ]
 }
