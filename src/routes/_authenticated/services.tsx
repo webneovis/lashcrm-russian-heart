@@ -61,7 +61,7 @@ function Services() {
       <div className="flex items-center justify-between rounded-md border p-3"><span className="text-sm font-medium">Услуга активна</span><Switch checked={form.is_active} onCheckedChange={v => setForm({ ...form, is_active: v })} /></div>
     </FormModal>
 
-    <FormModal open={catOpen} onOpenChange={setCatOpen} title="Категории услуг" description="Добавляйте, переименовывайте и удаляйте категории" onSubmit={submitCat}>
+    <FormModal open={catOpen} onOpenChange={setCatOpen} title="Категории услуг" description="Добавляйте, переименовывайте и удаляйте категории" onSubmit={submitCat} submitLabel={catEditing ? "Переименовать" : "Добавить категорию"}>
       <ul className="divide-y rounded-md border">{categories.map(c => <li key={c.id} className="flex items-center justify-between gap-2 p-3"><span className="font-medium">{c.name} <span className="text-sm text-muted-foreground">· {services.filter(s => s.category_id === c.id).length}</span></span><div className="flex"><Button type="button" variant="ghost" size="icon" onClick={() => startCat(c)} aria-label="Переименовать"><Edit2 /></Button><Button type="button" variant="ghost" size="icon" onClick={() => delCat(c)} aria-label="Удалить"><Trash2 /></Button></div></li>)}
         {categories.length === 0 && <li className="p-3 text-sm text-muted-foreground">Категорий пока нет</li>}</ul>
       <Field label={catEditing ? `Новое название для «${catEditing.name}»` : "Новая категория"}><Input value={catName} onChange={e => setCatName(e.target.value)} placeholder="Например, Брови" /></Field>
