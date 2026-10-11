@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the appointments month view as a compact date selector with a selected-day agenda on phones, and stack week days vertically, so appointment content never requires horizontal scrolling.
