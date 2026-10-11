@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CRMProvider } from "./data";
 
 const nav=[
- {to:"/",label:"Главная",icon:LayoutDashboard},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/today",label:"Сегодня",icon:CircleUserRound},{to:"/finance",label:"Финансы",icon:BarChart3},{to:"/settings",label:"Настройки",icon:Settings},
+ {to:"/today",label:"Сегодня",icon:CalendarCheck},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/finance",label:"Финансы",icon:BarChart3},{to:"/settings",label:"Настройки",icon:Settings},
 ] as const;
 export function AppShell({children}:{children:React.ReactNode}){
  const [open,setOpen]=useState(false),[collapsed,setCollapsed]=useState(false);const path=useRouterState({select:s=>s.location.pathname});
