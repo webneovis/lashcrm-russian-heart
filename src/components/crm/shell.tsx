@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, Gem, LayoutDashboard, LogOut, Menu, Settings, Sparkles, Users, X } from "lucide-react";
+import { BarChart3, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, Gem, LogOut, Menu, Settings, Sparkles, Users, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
