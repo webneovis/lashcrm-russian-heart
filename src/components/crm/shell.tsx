@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CRMProvider } from "./data";
 
 const nav=[
- {to:"/today",label:"Сегодня",icon:CalendarCheck},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/finance",label:"Финансы",icon:BarChart3},{to:"/settings",label:"Настройки",icon:Settings},
+ {to:"/today",label:"Сегодня",icon:CalendarCheck},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/analytics",label:"Аналитика",icon:BarChart3},{to:"/settings",label:"Настройки",icon:Settings},
 ] as const;
 export function AppShell({children}:{children:React.ReactNode}){
  const [open,setOpen]=useState(false),[collapsed,setCollapsed]=useState(false);const path=useRouterState({select:s=>s.location.pathname});
@@ -14,7 +14,7 @@ export function AppShell({children}:{children:React.ReactNode}){
   {open&&<div className="fixed inset-0 z-40 bg-overlay/50 lg:hidden" onClick={()=>setOpen(false)} />}
   <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ${open?"translate-x-0":"-translate-x-full"} ${collapsed?"lg:w-20":"lg:w-64"} w-64 lg:translate-x-0`}>
    <div className="flex h-20 items-center justify-between border-b border-sidebar-border px-5"><Link to="/" className="flex items-center gap-3 overflow-hidden"><span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground"><Gem className="size-5"/></span>{!collapsed&&<span className="font-display text-xl font-semibold">LashCRM</span>}</Link><Button variant="ghost" size="icon" className="lg:hidden" aria-label="Закрыть меню" onClick={()=>setOpen(false)}><X/></Button></div>
-   <nav className="flex-1 space-y-1 p-3">{nav.map(item=>{const Icon=item.icon;const active=path===item.to;return <Link key={item.to} to={item.to} onClick={()=>setOpen(false)} className={`flex h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${active?"bg-sidebar-primary text-sidebar-primary-foreground shadow-sm":"text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`} title={collapsed?item.label:undefined}><Icon className="size-5 shrink-0"/>{!collapsed&&item.label}</Link>})}</nav>
+    <nav className="flex-1 space-y-1 p-3">{nav.map(item=>{const Icon=item.icon;const active=path===item.to||(item.to==="/analytics"&&path==="/finance");return <Link key={item.to} to={item.to} onClick={()=>setOpen(false)} className={`flex h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${active?"bg-sidebar-primary text-sidebar-primary-foreground shadow-sm":"text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`} title={collapsed?item.label:undefined}><Icon className="size-5 shrink-0"/>{!collapsed&&item.label}</Link>})}</nav>
    <div className="border-t border-sidebar-border p-3"><Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={()=>void supabase.auth.signOut()}><LogOut/>{!collapsed&&"Выйти"}</Button></div>
    <Button variant="outline" size="icon" className="absolute -right-4 top-24 hidden rounded-full bg-background lg:inline-flex" onClick={()=>setCollapsed(v=>!v)} aria-label={collapsed?"Развернуть меню":"Свернуть меню"}>{collapsed?<ChevronRight/>:<ChevronLeft/>}</Button>
   </aside>
