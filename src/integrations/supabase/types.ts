@@ -193,6 +193,24 @@ export type Database = {
           },
         ]
       }
+      working_days: {
+        Row: {
+          created_at: string
+          owner_id: string
+          work_date: string
+        }
+        Insert: {
+          created_at?: string
+          owner_id?: string
+          work_date: string
+        }
+        Update: {
+          created_at?: string
+          owner_id?: string
+          work_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
