@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Edit2, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit2, Plus, Settings, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/crm/shell";
 import { type Appointment, money, statusLabels, useCRM } from "@/components/crm/data";
 import { AppointmentForm } from "@/components/crm/appointment-form";
+import { WorkingDaysEditor, useWorkingDays } from "@/components/crm/working-days";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
@@ -19,6 +20,8 @@ function Appointments() {
   const [mode, setMode] = useState<"day" | "week" | "month">("week");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Appointment | null>(null);
+  const [setup, setSetup] = useState(false);
+  const { days: workDays, toggle: toggleDay } = useWorkingDays();
   const dateKey = localDateKey(date);
   const todayKey = localDateKey(new Date());
   const range = useMemo(() => {
@@ -52,18 +55,21 @@ function Appointments() {
   return <>
     <PageHeader title="Записи" subtitle="Планируйте визиты и управляйте расписанием" action={<Button onClick={() => { setEditing(null); setOpen(true); }}><Plus />Добавить запись</Button>} />
     <div className="calendar-controls">
-      <div className="calendar-navigation"><div className="flex shrink-0 items-center gap-1"><Button variant="outline" size="icon" onClick={() => move(-1)} aria-label="Назад"><ChevronLeft /></Button><Button variant="outline" onClick={() => setDate(new Date())}>Сегодня</Button><Button variant="outline" size="icon" onClick={() => move(1)} aria-label="Вперёд"><ChevronRight /></Button></div><strong className="min-w-0 capitalize">{date.toLocaleDateString("ru-RU", { month: "long", year: "numeric" })}</strong></div>
-      <div className="segmented">{([['day', 'День'], ['week', 'Неделя'], ['month', 'Месяц']] as const).map(([value, label]) => <Button variant="ghost" key={value} aria-pressed={mode === value} className={mode === value ? "active" : ""} onClick={() => setMode(value)}>{label}</Button>)}</div>
+      <div className="calendar-navigation"><div className="flex shrink-0 items-center gap-1"><Button variant="outline" size="icon" onClick={() => move(-1)} aria-label="Назад"><ChevronLeft /></Button><Button variant="outline" onClick={() => setDate(new Date())}>Сегодня</Button><Button variant="outline" size="icon" onClick={() => move(1)} aria-label="Вперёд"><ChevronRight /></Button></div><div className="flex min-w-0 items-center justify-end gap-1 sm:justify-start"><strong className="min-w-0 capitalize">{date.toLocaleDateString("ru-RU", { month: "long", year: "numeric" })}</strong><Button variant={setup ? "default" : "ghost"} size="icon" title="Настроить рабочие дни" aria-label="Настроить рабочие дни" aria-pressed={setup} onClick={() => { setSetup(!setup); if (!setup) setMode("month"); }}><Settings /></Button></div></div>
+      {!setup && <div className="segmented">{([['day', 'День'], ['week', 'Неделя'], ['month', 'Месяц']] as const).map(([value, label]) => <Button variant="ghost" key={value} aria-pressed={mode === value} className={mode === value ? "active" : ""} onClick={() => setMode(value)}>{label}</Button>)}</div>}
+      {setup && <Button variant="outline" onClick={() => setSetup(false)}>Готово</Button>}
     </div>
+    {setup ? <WorkingDaysEditor range={range} keyOf={localDateKey} days={workDays} toggle={(k, on) => void toggleDay(k, on)} /> : <>
     {mode === "month" && <div className="mobile-month-calendar">
       <div className="mobile-month-weekdays">{["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map(day => <span key={day}>{day}</span>)}</div>
       <div className="mobile-month-dates">
         {Array.from({ length: ((range[0]?.getDay() ?? 1) + 6) % 7 }, (_, i) => <span key={`blank-${i}`} />)}
-        {range.map(day => { const key = localDateKey(day); const count = appointments.filter(a => a.appointment_date === key).length; return <Button key={key} variant="ghost" className={`mobile-date ${key === dateKey ? "selected" : ""} ${key === todayKey ? "today" : ""}`} aria-pressed={key === dateKey} aria-label={`${day.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}, записей: ${count}`} onClick={() => setDate(day)}><b>{day.getDate()}</b><span>{count > 0 ? count : ""}</span></Button>; })}
+        {range.map(day => { const key = localDateKey(day); const count = appointments.filter(a => a.appointment_date === key).length; return <Button key={key} variant="ghost" className={`mobile-date ${key === dateKey ? "selected" : ""} ${key === todayKey ? "today" : ""} ${workDays.has(key) ? "" : "is-off"}`} aria-pressed={key === dateKey} aria-label={`${day.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}, записей: ${count}`} onClick={() => setDate(day)}><b>{day.getDate()}</b><span>{count > 0 ? count : ""}</span></Button>; })}
       </div>
-      <section className="mobile-day-agenda"><h2>{date.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}</h2>{renderItems(dateKey)}</section>
+      <section className="mobile-day-agenda"><h2>{date.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}{workDays.has(dateKey) ? "" : " · выходной"}</h2>{renderItems(dateKey)}</section>
     </div>}
-    <div className={`calendar-grid calendar-${mode}`}>{range.map(day => { const key = localDateKey(day); return <section key={key} className={`calendar-day ${key === todayKey ? "is-current" : ""}`}><header><span>{day.toLocaleDateString("ru-RU", { weekday: "short" })}</span><b>{day.getDate()}</b></header>{renderItems(key)}</section>; })}</div>
+    <div className={`calendar-grid calendar-${mode}`}>{range.map(day => { const key = localDateKey(day); const off = !workDays.has(key); return <section key={key} className={`calendar-day ${key === todayKey ? "is-current" : ""} ${off ? "is-off" : ""}`}><header><span>{day.toLocaleDateString("ru-RU", { weekday: "short" })}{off ? " · выходной" : ""}</span><b>{day.getDate()}</b></header>{renderItems(key)}</section>; })}</div>
+    </>}
     <AppointmentForm open={open} onOpenChange={setOpen} editing={editing} />
   </>;
 }
