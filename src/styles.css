@@ -237,3 +237,12 @@
 .calendar-day.is-off { opacity:.55; }
 .mobile-date.is-off b { opacity:.45; }
 @media (max-width:639px){ .workdays-editor{padding:.6rem} .workdays-cell small{display:none} .workdays-cell [role=switch]{transform:scale(.8)} }
+
+.calendar-day-select { display:flex; width:100%; align-items:center; justify-content:space-between; gap:.4rem; margin-bottom:.7rem; padding:0; border:0; background:none; color:var(--muted-foreground); font:inherit; font-size:.72rem; text-transform:capitalize; text-align:left; cursor:pointer; }
+.calendar-day-select b { display:flex; width:1.7rem; height:1.7rem; flex:none; align-items:center; justify-content:center; border-radius:50%; }
+.calendar-day.is-current .calendar-day-select b { background:var(--primary); color:var(--primary-foreground); }
+.calendar-day.is-selected { box-shadow:inset 0 0 0 2px var(--primary); }
+.calendar-day-select:hover b { background:var(--muted); }
+.calendar-empty.calendar-rest { font-style:italic; }
+.day-add-btn { width:100%; height:2.1rem; margin-top:.55rem; justify-content:center; border-style:dashed; border-color:var(--primary); color:var(--primary); font-size:.72rem; }
+@media (max-width:640px){ .calendar-day-select{font-size:.85rem;min-height:2rem;margin-bottom:.75rem} .calendar-day-select b{width:2rem;height:2rem} .calendar-empty.calendar-rest{font-size:.875rem} .day-add-btn{height:2.9rem;font-size:.875rem} }
