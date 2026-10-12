@@ -37,23 +37,27 @@ function Appointments() {
     else next.setDate(next.getDate() + step * (mode === "week" ? 7 : 1));
     setDate(next);
   };
-  const renderItems = (key: string) => {
+  const renderItems = (key: string, selected: boolean) => {
     const items = appointments.filter(a => a.appointment_date === key).sort((a, b) => a.start_time.localeCompare(b.start_time));
-    return items.length ? <div className="space-y-2">{items.map(a => {
-      const client = clients.find(c => c.id === a.client_id);
-      const service = services.find(s => s.id === a.service_id);
-      return <article key={a.id} className={`appointment-chip appointment-${a.status}`}>
-        <div className="appointment-summary"><strong>{a.start_time.slice(0, 5)}</strong><span>{money(Number(a.price))}</span></div>
-        <p>{client?.full_name}</p><small>{service?.name}</small>
-        <div className="appointment-footer"><span>{statusLabels[a.status]}</span><div className="appointment-actions">
-          <Button variant="ghost" size="icon" title="Редактировать запись" aria-label="Редактировать запись" onClick={() => { setEditing(a); setOpen(true); }}><Edit2 /></Button>
-          <Button variant="ghost" size="icon" title="Удалить запись" aria-label="Удалить запись" onClick={() => { if (confirm("Удалить запись?")) void removeAppointment(a.id); }}><Trash2 /></Button>
-        </div></div>
-      </article>;
-    })}</div> : <p className="calendar-empty">Нет записей</p>;
+    const working = workDays.has(key);
+    return <>
+      {items.length ? <div className="space-y-2">{items.map(a => {
+        const client = clients.find(c => c.id === a.client_id);
+        const service = services.find(s => s.id === a.service_id);
+        return <article key={a.id} className={`appointment-chip appointment-${a.status}`}>
+          <div className="appointment-summary"><strong>{a.start_time.slice(0, 5)}</strong><span>{money(Number(a.price))}</span></div>
+          <p>{client?.full_name}</p><small>{service?.name}</small>
+          <div className="appointment-footer"><span>{statusLabels[a.status]}</span><div className="appointment-actions">
+            <Button variant="ghost" size="icon" title="Редактировать запись" aria-label="Редактировать запись" onClick={() => { setEditing(a); setOpen(true); }}><Edit2 /></Button>
+            <Button variant="ghost" size="icon" title="Удалить запись" aria-label="Удалить запись" onClick={() => { if (confirm("Удалить запись?")) void removeAppointment(a.id); }}><Trash2 /></Button>
+          </div></div>
+        </article>;
+      })}</div> : selected && !working ? <p className="calendar-empty calendar-rest">В этот день ты отдыхаешь</p> : selected ? null : <p className="calendar-empty">Нет записей</p>}
+      {selected && working && <Button variant="outline" className="day-add-btn" onClick={() => { setEditing(null); setOpen(true); }}><Plus />Добавить запись</Button>}
+    </>;
   };
   return <>
-    <PageHeader title="Записи" subtitle="Планируйте визиты и управляйте расписанием" action={<Button onClick={() => { setEditing(null); setOpen(true); }}><Plus />Добавить запись</Button>} />
+    <PageHeader title="Записи" subtitle="Планируйте визиты и управляйте расписанием" />
     <div className="calendar-controls">
       <div className="calendar-navigation"><div className="flex shrink-0 items-center gap-1"><Button variant="outline" size="icon" onClick={() => move(-1)} aria-label="Назад"><ChevronLeft /></Button><Button variant="outline" onClick={() => setDate(new Date())}>Сегодня</Button><Button variant="outline" size="icon" onClick={() => move(1)} aria-label="Вперёд"><ChevronRight /></Button></div><div className="flex min-w-0 items-center justify-end gap-1 sm:justify-start"><strong className="min-w-0 capitalize">{date.toLocaleDateString("ru-RU", { month: "long", year: "numeric" })}</strong><Button variant={setup ? "default" : "ghost"} size="icon" title="Настроить рабочие дни" aria-label="Настроить рабочие дни" aria-pressed={setup} onClick={() => { setSetup(!setup); if (!setup) setMode("month"); }}><Settings /></Button></div></div>
       {!setup && <div className="segmented">{([['day', 'День'], ['week', 'Неделя'], ['month', 'Месяц']] as const).map(([value, label]) => <Button variant="ghost" key={value} aria-pressed={mode === value} className={mode === value ? "active" : ""} onClick={() => setMode(value)}>{label}</Button>)}</div>}
@@ -66,10 +70,10 @@ function Appointments() {
         {Array.from({ length: ((range[0]?.getDay() ?? 1) + 6) % 7 }, (_, i) => <span key={`blank-${i}`} />)}
         {range.map(day => { const key = localDateKey(day); const count = appointments.filter(a => a.appointment_date === key).length; return <Button key={key} variant="ghost" className={`mobile-date ${key === dateKey ? "selected" : ""} ${key === todayKey ? "today" : ""} ${workDays.has(key) ? "" : "is-off"}`} aria-pressed={key === dateKey} aria-label={`${day.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}, записей: ${count}`} onClick={() => setDate(day)}><b>{day.getDate()}</b><span>{count > 0 ? count : ""}</span></Button>; })}
       </div>
-      <section className="mobile-day-agenda"><h2>{date.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}{workDays.has(dateKey) ? "" : " · выходной"}</h2>{renderItems(dateKey)}</section>
+      <section className="mobile-day-agenda"><h2>{date.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}{workDays.has(dateKey) ? "" : " · выходной"}</h2>{renderItems(dateKey, true)}</section>
     </div>}
-    <div className={`calendar-grid calendar-${mode}`}>{range.map(day => { const key = localDateKey(day); const off = !workDays.has(key); return <section key={key} className={`calendar-day ${key === todayKey ? "is-current" : ""} ${off ? "is-off" : ""}`}><header><span>{day.toLocaleDateString("ru-RU", { weekday: "short" })}{off ? " · выходной" : ""}</span><b>{day.getDate()}</b></header>{renderItems(key)}</section>; })}</div>
+    <div className={`calendar-grid calendar-${mode}`}>{range.map(day => { const key = localDateKey(day); const off = !workDays.has(key); const selected = key === dateKey; return <section key={key} className={`calendar-day ${key === todayKey ? "is-current" : ""} ${off ? "is-off" : ""} ${selected ? "is-selected" : ""}`}><button type="button" className="calendar-day-select" aria-pressed={selected} aria-label={`Выбрать день ${day.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}`} onClick={() => setDate(day)}><span>{day.toLocaleDateString("ru-RU", { weekday: "short" })}{off ? " · выходной" : ""}</span><b>{day.getDate()}</b></button>{renderItems(key, selected)}</section>; })}</div>
     </>}
-    <AppointmentForm open={open} onOpenChange={setOpen} editing={editing} />
+    <AppointmentForm open={open} onOpenChange={setOpen} editing={editing} presetDate={dateKey} />
   </>;
 }
