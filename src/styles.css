@@ -227,3 +227,13 @@
   .mobile-day-agenda { margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border); }
   .mobile-day-agenda h2 { font-size:1rem; font-weight:600; text-transform:capitalize; margin-bottom:.75rem; }
 }
+.workdays-editor { border:1px solid var(--border); background:var(--card); border-radius:var(--radius); padding:1rem; }
+.workdays-hint { font-size:.85rem; color:var(--muted-foreground); margin-bottom:.75rem; }
+.workdays-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:.4rem; }
+.workdays-weekday { text-align:center; font-size:.7rem; color:var(--muted-foreground); text-transform:uppercase; }
+.workdays-cell { display:flex; flex-direction:column; align-items:center; gap:.35rem; padding:.5rem .2rem; border:1px solid var(--border); border-radius:calc(var(--radius) - 2px); background:var(--muted); cursor:pointer; min-width:0; }
+.workdays-cell small { font-size:.65rem; color:var(--muted-foreground); }
+.workdays-cell.is-working { background:var(--accent); border-color:var(--primary); }
+.calendar-day.is-off { opacity:.55; }
+.mobile-date.is-off b { opacity:.45; }
+@media (max-width:639px){ .workdays-editor{padding:.6rem} .workdays-cell small{display:none} .workdays-cell [role=switch]{transform:scale(.8)} }
