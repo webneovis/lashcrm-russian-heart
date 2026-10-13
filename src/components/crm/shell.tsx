@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BarChart3, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, Gem, LogOut, Menu, Settings, Sparkles, Users, X } from "lucide-react";
+import { BarChart3, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleUserRound, Gem, LogOut, Menu, Sparkles, Users, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { CRMProvider } from "./data";
 
 const nav=[
- {to:"/today",label:"Сегодня",icon:CalendarCheck},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/analytics",label:"Аналитика",icon:BarChart3},{to:"/settings",label:"Настройки",icon:Settings},
+ {to:"/today",label:"Сегодня",icon:CalendarCheck},{to:"/clients",label:"Клиенты",icon:Users},{to:"/services",label:"Услуги",icon:Sparkles},{to:"/appointments",label:"Записи",icon:CalendarDays},{to:"/analytics",label:"Аналитика",icon:BarChart3},
 ] as const;
 export function AppShell({children}:{children:React.ReactNode}){
  const [open,setOpen]=useState(false),[collapsed,setCollapsed]=useState(false);const path=useRouterState({select:s=>s.location.pathname});
@@ -18,7 +18,7 @@ export function AppShell({children}:{children:React.ReactNode}){
    <div className="border-t border-sidebar-border p-3"><Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={()=>void supabase.auth.signOut()}><LogOut/>{!collapsed&&"Выйти"}</Button></div>
    <Button variant="outline" size="icon" className="absolute -right-4 top-24 hidden rounded-full bg-background lg:inline-flex" onClick={()=>setCollapsed(v=>!v)} aria-label={collapsed?"Развернуть меню":"Свернуть меню"}>{collapsed?<ChevronRight/>:<ChevronLeft/>}</Button>
   </aside>
-  <div className={`transition-all duration-300 ${collapsed?"lg:pl-20":"lg:pl-64"}`}><header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur md:px-8"><Button variant="ghost" size="icon" className="lg:hidden" onClick={()=>setOpen(true)} aria-label="Открыть меню"><Menu/></Button><div className="hidden text-sm text-muted-foreground sm:block">Рабочее пространство мастера</div><div className="flex items-center gap-3"><div className="text-right"><p className="text-sm font-medium">Мой салон</p><p className="text-xs text-muted-foreground">Владелец</p></div><span className="flex size-9 items-center justify-center rounded-full bg-secondary text-secondary-foreground"><CircleUserRound className="size-5"/></span></div></header><main className="mx-auto max-w-[1500px] p-4 md:p-8">{children}</main></div>
+  <div className={`transition-all duration-300 ${collapsed?"lg:pl-20":"lg:pl-64"}`}><header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur md:px-8"><Button variant="ghost" size="icon" className="lg:hidden" onClick={()=>setOpen(true)} aria-label="Открыть меню"><Menu/></Button><div className="hidden text-sm text-muted-foreground sm:block">Рабочее пространство мастера</div><Link to="/settings" aria-label="Открыть профиль" title="Профиль" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-primary/15 hover:text-primary"><CircleUserRound className="size-5"/></Link></header><main className="mx-auto max-w-[1500px] p-4 md:p-8">{children}</main></div>
  </div></CRMProvider>
 }
 export function PageHeader({title,subtitle,action}:{title:string;subtitle:string;action?:React.ReactNode}){return <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">LashCRM</p><h1 className="font-display text-3xl font-semibold md:text-4xl">{title}</h1><p className="mt-2 text-sm text-muted-foreground">{subtitle}</p></div>{action}</div>}
