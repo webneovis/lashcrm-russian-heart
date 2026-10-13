@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export type Client = { id:string; full_name:string; phone:string; instagram:string|null; birth_date:string|null; notes:string|null; created_at:string };
 export type Category = { id:string; name:string; created_at:string };
 export type Service = { id:string; name:string; description:string|null; duration_minutes:number; price:number; is_active:boolean; category_id:string|null; created_at:string };
-export type Appointment = { id:string; client_id:string; service_id:string; appointment_date:string; start_time:string; end_time:string; price:number; comment:string|null; status:"scheduled"|"confirmed"|"completed"|"cancelled"; created_at:string };
+export type Appointment = { id:string; client_id:string; service_id:string; appointment_date:string; start_time:string; end_time:string; price:number; comment:string|null; status:"scheduled"|"completed"|"cancelled"; created_at:string };
 
 type CRMContextValue = {
   clients: Client[]; services: Service[]; categories: Category[]; appointments: Appointment[]; loading:boolean;
@@ -42,6 +42,6 @@ export function CRMProvider({children}:{children:ReactNode}){
  return <CRMContext.Provider value={value}>{children}</CRMContext.Provider>
 }
 export function useCRM(){const value=useContext(CRMContext);if(!value)throw new Error("Данные CRM недоступны");return value}
-export const statusLabels={scheduled:"Запланировано",confirmed:"Подтверждено",completed:"Выполнено",cancelled:"Отменено"} as const;
+export const statusLabels={scheduled:"Запланировано",completed:"Выполнено",cancelled:"Отменено"} as const;
 export const money=(v:number)=>new Intl.NumberFormat("ru-RU",{style:"currency",currency:"RUB",maximumFractionDigits:0}).format(v);
 export const shortDate=(v:string)=>new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short"}).format(new Date(`${v}T12:00:00`));
