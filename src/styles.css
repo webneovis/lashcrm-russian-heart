@@ -246,3 +246,8 @@
 .calendar-empty.calendar-rest { font-style:italic; }
 .day-add-btn { width:100%; height:2.1rem; margin-top:.55rem; justify-content:center; border-style:dashed; border-color:var(--primary); color:var(--primary); font-size:.72rem; }
 @media (max-width:640px){ .calendar-day-select{font-size:.85rem;min-height:2rem;margin-bottom:.75rem} .calendar-day-select b{width:2rem;height:2rem} .calendar-empty.calendar-rest{font-size:.875rem} .day-add-btn{height:2.9rem;font-size:.875rem} }
+
+.break-chip { padding:.6rem .7rem; border-radius:var(--radius); border:1px dashed var(--border); background:repeating-linear-gradient(135deg, var(--muted), var(--muted) 6px, transparent 6px, transparent 12px); color:var(--muted-foreground); font-size:.8rem; }
+.break-chip p { color:var(--foreground); font-weight:500; overflow-wrap:anywhere; }
+.form-kind { display:grid; grid-template-columns:1fr 1fr; }
+.form-kind button { min-height:2.5rem; font-size:.85rem; }
