@@ -71,6 +71,36 @@ export type Database = {
           },
         ]
       }
+      breaks: {
+        Row: {
+          break_date: string
+          created_at: string
+          end_time: string
+          id: string
+          owner_id: string
+          start_time: string
+          title: string
+        }
+        Insert: {
+          break_date: string
+          created_at?: string
+          end_time: string
+          id?: string
+          owner_id?: string
+          start_time: string
+          title: string
+        }
+        Update: {
+          break_date?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          owner_id?: string
+          start_time?: string
+          title?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           birth_date: string | null

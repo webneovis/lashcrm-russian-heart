@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Edit2, Plus, Settings, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Coffee, Edit2, Plus, Settings, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/crm/shell";
-import { type Appointment, money, statusLabels, useCRM } from "@/components/crm/data";
+import { type Appointment, type Break, money, statusLabels, useCRM } from "@/components/crm/data";
 import { AppointmentForm } from "@/components/crm/appointment-form";
 import { WorkingDaysEditor, useWorkingDays } from "@/components/crm/working-days";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,8 @@ export const Route = createFileRoute("/_authenticated/appointments")({
 const localDateKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 function Appointments() {
-  const { appointments, clients, services, removeAppointment } = useCRM();
+  const { appointments, breaks, clients, services, removeAppointment, removeBreak } = useCRM();
+  const [editingBreak, setEditingBreak] = useState<Break | null>(null);
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState<"day" | "week" | "month">("week");
   const [open, setOpen] = useState(false);
@@ -40,20 +41,31 @@ function Appointments() {
   const renderItems = (key: string, selected: boolean) => {
     const items = appointments.filter(a => a.appointment_date === key).sort((a, b) => a.start_time.localeCompare(b.start_time));
     const working = workDays.has(key);
+    const dayBreaks = breaks.filter(b => b.break_date === key);
+    const entries = [...items.map(a => ({ t: a.start_time, a, b: null as Break | null })), ...dayBreaks.map(b => ({ t: b.start_time, a: null as Appointment | null, b }))].sort((x, y) => x.t.localeCompare(y.t));
     return <>
-      {items.length ? <div className="space-y-2">{items.map(a => {
+      {entries.length ? <div className="space-y-2">{entries.map(({ a, b }) => {
+        if (b) return <article key={b.id} className="break-chip">
+          <div className="appointment-summary"><strong><Coffee className="inline size-3.5 mr-1" />{b.start_time.slice(0, 5)}–{b.end_time.slice(0, 5)}</strong></div>
+          <p>{b.title}</p>
+          <div className="appointment-footer"><span>Перерыв</span><div className="appointment-actions">
+            <Button variant="ghost" size="icon" title="Редактировать перерыв" aria-label="Редактировать перерыв" onClick={() => { setEditing(null); setEditingBreak(b); setOpen(true); }}><Edit2 /></Button>
+            <Button variant="ghost" size="icon" title="Удалить перерыв" aria-label="Удалить перерыв" onClick={() => { if (confirm("Удалить перерыв?")) void removeBreak(b.id); }}><Trash2 /></Button>
+          </div></div>
+        </article>;
+        if (!a) return null;
         const client = clients.find(c => c.id === a.client_id);
         const service = services.find(s => s.id === a.service_id);
         return <article key={a.id} className={`appointment-chip appointment-${a.status}`}>
           <div className="appointment-summary"><strong>{a.start_time.slice(0, 5)}</strong><span>{money(Number(a.price))}</span></div>
           <p>{client?.full_name}</p><small>{service?.name}</small>
           <div className="appointment-footer"><span>{statusLabels[a.status]}</span><div className="appointment-actions">
-            <Button variant="ghost" size="icon" title="Редактировать запись" aria-label="Редактировать запись" onClick={() => { setEditing(a); setOpen(true); }}><Edit2 /></Button>
+            <Button variant="ghost" size="icon" title="Редактировать запись" aria-label="Редактировать запись" onClick={() => { setEditingBreak(null); setEditing(a); setOpen(true); }}><Edit2 /></Button>
             <Button variant="ghost" size="icon" title="Удалить запись" aria-label="Удалить запись" onClick={() => { if (confirm("Удалить запись?")) void removeAppointment(a.id); }}><Trash2 /></Button>
           </div></div>
         </article>;
       })}</div> : selected && !working ? <p className="calendar-empty calendar-rest">В этот день ты отдыхаешь</p> : selected ? null : <p className="calendar-empty">Нет записей</p>}
-      {selected && working && <Button variant="outline" className="day-add-btn" onClick={() => { setEditing(null); setOpen(true); }}><Plus />Добавить запись</Button>}
+      {selected && working && <Button variant="outline" className="day-add-btn" onClick={() => { setEditing(null); setEditingBreak(null); setOpen(true); }}><Plus />Добавить запись</Button>}
     </>;
   };
   return <>
@@ -74,6 +86,6 @@ function Appointments() {
     </div>}
     <div className={`calendar-grid calendar-${mode}`}>{range.map(day => { const key = localDateKey(day); const off = !workDays.has(key); const selected = key === dateKey; return <section key={key} className={`calendar-day ${key === todayKey ? "is-current" : ""} ${off ? "is-off" : ""} ${selected ? "is-selected" : ""}`}><button type="button" className="calendar-day-select" aria-pressed={selected} aria-label={`Выбрать день ${day.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}`} onClick={() => setDate(day)}><span>{day.toLocaleDateString("ru-RU", { weekday: "short" })}{off ? " · выходной" : ""}</span><b>{day.getDate()}</b></button>{renderItems(key, selected)}</section>; })}</div>
     </>}
-    <AppointmentForm open={open} onOpenChange={setOpen} editing={editing} presetDate={dateKey} />
+    <AppointmentForm open={open} onOpenChange={setOpen} editing={editing} editingBreak={editingBreak} presetDate={dateKey} />
   </>;
 }
