@@ -6,9 +6,11 @@ export type Client = { id:string; full_name:string; phone:string; instagram:stri
 export type Category = { id:string; name:string; created_at:string };
 export type Service = { id:string; name:string; description:string|null; duration_minutes:number; price:number; is_active:boolean; category_id:string|null; created_at:string };
 export type Appointment = { id:string; client_id:string; service_id:string; appointment_date:string; start_time:string; end_time:string; price:number; comment:string|null; status:"scheduled"|"completed"|"cancelled"; created_at:string };
+export type Break = { id:string; break_date:string; start_time:string; end_time:string; title:string; created_at:string };
 
 type CRMContextValue = {
-  clients: Client[]; services: Service[]; categories: Category[]; appointments: Appointment[]; loading:boolean;
+  clients: Client[]; services: Service[]; categories: Category[]; appointments: Appointment[]; breaks: Break[]; loading:boolean;
+  saveBreak:(value:{break_date:string;start_time:string;end_time:string;title:string},id?:string)=>Promise<boolean>; removeBreak:(id:string)=>Promise<boolean>;
   refresh:()=>Promise<void>; saveClient:(value:Partial<Client>&{full_name:string;phone:string}, id?:string)=>Promise<boolean>;
   removeClient:(id:string)=>Promise<boolean>; saveService:(value:Partial<Service>&{name:string;duration_minutes:number;price:number},id?:string)=>Promise<boolean>;
   removeService:(id:string)=>Promise<boolean>; saveAppointment:(value:Partial<Appointment>&{client_id:string;service_id:string;appointment_date:string;start_time:string;end_time:string;price:number},id?:string)=>Promise<boolean>;
