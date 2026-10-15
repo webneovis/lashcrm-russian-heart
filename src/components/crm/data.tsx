@@ -41,7 +41,9 @@ export function CRMProvider({children}:{children:ReactNode}){
   saveService:mutateService,removeService:async id=>{const {error}=await supabase.from("services").delete().eq("id",id);if(error){toast.error("Нельзя удалить услугу с записями");return false}toast.success("Услуга удалена");await refresh();return true},
   saveAppointment:mutateAppointment,removeAppointment:async id=>{const {error}=await supabase.from("appointments").delete().eq("id",id);if(error){toast.error("Не удалось удалить запись");return false}toast.success("Запись удалена");await refresh();return true},
   setStatus:async(id,status)=>{const {error}=await supabase.from("appointments").update({status}).eq("id",id);await finish(error,id)},
-  saveCategory:async(name,id)=>{const {error}=id?await supabase.from("service_categories").update({name}).eq("id",id):await supabase.from("service_categories").insert({name});if(error){toast.error("Не удалось сохранить категорию");return false}toast.success(id?"Категория переименована":"Категория добавлена");await refresh();return true},
+  cancelAppointment:async(id,reason)=>{const {error}=await supabase.from("appointments").update({status:"cancelled",cancel_reason:reason}).eq("id",id);if(error){toast.error("Не удалось отменить запись");return false}toast.success("Запись отменена и добавлена в журнал");await refresh();return true},
+   rescheduleAppointment:async(id,date,start,end)=>{const {error}=await supabase.from("appointments").update({appointment_date:date,start_time:start,end_time:end,status:"scheduled",cancel_reason:null}).eq("id",id);if(error){toast.error("Не удалось перенести запись");return false}toast.success("Запись перенесена и снова запланирована");await refresh();return true},
+   saveCategory:async(name,id)=>{const {error}=id?await supabase.from("service_categories").update({name}).eq("id",id):await supabase.from("service_categories").insert({name});if(error){toast.error("Не удалось сохранить категорию");return false}toast.success(id?"Категория переименована":"Категория добавлена");await refresh();return true},
   removeCategory:async id=>{const {error}=await supabase.from("service_categories").delete().eq("id",id);if(error){toast.error("Не удалось удалить категорию");return false}toast.success("Категория удалена");await refresh();return true}
  }),[clients,services,categories,appointments,breaks,loading]);
  return <CRMContext.Provider value={value}>{children}</CRMContext.Provider>
@@ -51,5 +53,5 @@ export const statusLabels={scheduled:"Запланировано",completed:"В�
 export const money=(v:number)=>new Intl.NumberFormat("ru-RU",{style:"currency",currency:"RUB",maximumFractionDigits:0}).format(v);
 export const shortDate=(v:string)=>new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short"}).format(new Date(`${v}T12:00:00`));
 export const cancelReasonLabels={master:"Отменено мастером",client:"Отменено клиентом"} as const;
-export const toMin=(t:string)=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+export const toMin=(t:string)=>{const [h=0,m=0]=t.split(":").map(Number);return h*60+m};
 export function hasConflict(appointments:Appointment[],breaks:Break[],date:string,start:string,end:string,ignoreId?:string){const s=toMin(start),e=toMin(end);return appointments.some(a=>a.id!==ignoreId&&a.status!=="cancelled"&&a.appointment_date===date&&toMin(a.start_time)<e&&toMin(a.end_time)>s)||breaks.some(b=>b.break_date===date&&toMin(b.start_time)<e&&toMin(b.end_time)>s)}
