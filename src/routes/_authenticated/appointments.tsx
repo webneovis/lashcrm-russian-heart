@@ -15,7 +15,8 @@ export const Route = createFileRoute("/_authenticated/appointments")({
 const localDateKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 function Appointments() {
-  const { appointments, breaks, clients, services, removeAppointment, removeBreak } = useCRM();
+  const { appointments: allAppointments, breaks, clients, services, removeAppointment, removeBreak } = useCRM();
+  const appointments = useMemo(() => allAppointments.filter(a => a.status !== "cancelled"), [allAppointments]);
   const [editingBreak, setEditingBreak] = useState<Break | null>(null);
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState<"day" | "week" | "month">("week");
