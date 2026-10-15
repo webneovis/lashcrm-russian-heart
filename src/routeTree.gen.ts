@@ -15,6 +15,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAppointmentsRouteImport } from './routes/_authenticated/appointments'
+import { Route as AuthenticatedCancellationsRouteImport } from './routes/_authenticated/cancellations'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedServicesRouteImport } from './routes/_authenticated/services'
@@ -50,6 +51,12 @@ const AuthenticatedAppointmentsRoute =
   AuthenticatedAppointmentsRouteImport.update({
     id: '/appointments',
     path: '/appointments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCancellationsRoute =
+  AuthenticatedCancellationsRouteImport.update({
+    id: '/cancellations',
+    path: '/cancellations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedClientsRoute = AuthenticatedClientsRouteImport.update({
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
+  '/cancellations': typeof AuthenticatedCancellationsRoute
   '/clients': typeof AuthenticatedClientsRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/services': typeof AuthenticatedServicesRoute
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/appointments': typeof AuthenticatedAppointmentsRoute
+  '/cancellations': typeof AuthenticatedCancellationsRoute
   '/clients': typeof AuthenticatedClientsRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/services': typeof AuthenticatedServicesRoute
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/appointments': typeof AuthenticatedAppointmentsRoute
+  '/_authenticated/cancellations': typeof AuthenticatedCancellationsRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/services': typeof AuthenticatedServicesRoute
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/analytics'
     | '/appointments'
+    | '/cancellations'
     | '/clients'
     | '/finance'
     | '/services'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/analytics'
     | '/appointments'
+    | '/cancellations'
     | '/clients'
     | '/finance'
     | '/services'
@@ -158,6 +170,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/analytics'
     | '/_authenticated/appointments'
+    | '/_authenticated/cancellations'
     | '/_authenticated/clients'
     | '/_authenticated/finance'
     | '/_authenticated/services'
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/appointments'
       fullPath: '/appointments'
       preLoaderRoute: typeof AuthenticatedAppointmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cancellations': {
+      id: '/_authenticated/cancellations'
+      path: '/cancellations'
+      fullPath: '/cancellations'
+      preLoaderRoute: typeof AuthenticatedCancellationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clients': {
@@ -276,6 +296,7 @@ const AuthenticatedClientsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAppointmentsRoute: typeof AuthenticatedAppointmentsRoute
+  AuthenticatedCancellationsRoute: typeof AuthenticatedCancellationsRoute
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedServicesRoute: typeof AuthenticatedServicesRoute
@@ -287,6 +308,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAppointmentsRoute: AuthenticatedAppointmentsRoute,
+  AuthenticatedCancellationsRoute: AuthenticatedCancellationsRoute,
   AuthenticatedClientsRoute: AuthenticatedClientsRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedServicesRoute: AuthenticatedServicesRoute,

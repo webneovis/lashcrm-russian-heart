@@ -1,0 +1,1 @@
+ALTER TABLE public.appointments ADD COLUMN cancel_reason text CHECK (cancel_reason IN ('master','client'));

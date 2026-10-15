@@ -36,6 +36,13 @@
       "when": 1791971097604,
       "tag": "0004_create_breaks",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792056477817,
+      "tag": "0005_appointment_cancel_reason",
+      "breakpoints": true
     }
   ]
 }
